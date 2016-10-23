@@ -17,5 +17,5 @@
 /tmp
 
 .env
-
+.DS_STORE
 node_modules/

@@ -52,8 +52,8 @@ module.exports = {
   createCollection: function(cluster_id, callback) {
       params = {
         cluster_id: cluster_id,
-        config_name: 'default',
-        collection_name: 'default'
+        config_name: 'example_config',
+        collection_name: 'example_collection'
       }
       this.service.createCollection(params, function(err, response) {
         if (err) {
@@ -67,7 +67,7 @@ module.exports = {
   getSolrClient: function() {
     return this.service.createSolrClient({
       cluster_id: cluster_id,
-      collection_name: 'default'
+      collection_name: 'example_collection'
     });
   },
 
@@ -92,7 +92,7 @@ module.exports = {
     });
   },
 
-  search: function(query) {
+  search: function(key, query, callback) {
     console.log('Searching all documents.');
     var solrClient = this.getSolrClient();
     var query = solrClient.createQuery();
@@ -100,7 +100,7 @@ module.exports = {
     // For a wildcard query use:
     // query.q({ '*' : '*' });
     query.q({
-      'content_text': 'harvard'
+        'content_text' : 'Winners'
     });
 
     solrClient.search(query, function(err, searchResponse) {
