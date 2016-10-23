@@ -5,6 +5,8 @@ const bodyParser = require('body-parser')
 const request = require('request')
 const app = express()
 
+const fb_token = process.env.FB_ACCESS_TOKEN;
+
 app.set('port', (process.env.PORT || 5000))
 
 // Process application/x-www-form-urlencoded
@@ -13,6 +15,28 @@ app.use(bodyParser.urlencoded({extended: false}))
 // Process application/json
 app.use(bodyParser.json())
 
+
+function sendTextMessage(sender, text) {
+  let messageData = {
+      text: text
+  }
+  request({
+    url: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: fb_token },
+    method: 'POST',
+    json: {
+      recipient: { id: sender },
+      message: messageData;
+    }
+  }, function(err, resp, body) {
+      if (err) {
+        console.log('error sending message: ', error);
+      } else if (resp.body.error) {
+        console.log('Error: ', response.body.error)
+      }
+  })
+}
+
 // Index route
 app.get('/', function (req, res) {
     res.send('Hello world, I am a chat bot')
@@ -20,10 +44,15 @@ app.get('/', function (req, res) {
 
 // for Facebook verification
 app.get('/webhook/', function (req, res) {
-    if (req.query['hub.verify_token'] === 'liasion_is_the_best_bot') {
-        res.send(req.query['hub.challenge'])
+  let messaging_events = req.body.entry[0].messaging
+  for (let i = 0; i < messaging_events.length; i++) {
+    let event = req.body.entry[0].messaging[i]
+    let sender = event.sender.id
+    if (event.message && event.message.text) {
+      sendTextMessage(sender, "Text Rec:, echo: " text.substring(0,200));
     }
-    res.send('Error, wrong token')
+  }
+  res.sendStatus(200)
 })
 
 // Spin up the server
