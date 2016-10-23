@@ -26,13 +26,13 @@ function sendTextMessage(sender, text) {
     method: 'POST',
     json: {
       recipient: { id: sender },
-      message: messageData;
+      message: messageData
     }
   }, function(err, resp, body) {
       if (err) {
         console.log('error sending message: ', error);
       } else if (resp.body.error) {
-        console.log('Error: ', response.body.error)
+        console.log('Error: ', resp.body.error)
       }
   })
 }
@@ -43,13 +43,14 @@ app.get('/', function (req, res) {
 })
 
 // for Facebook verification
-app.get('/webhook/', function (req, res) {
+app.post('/webhook/', function (req, res) {
   let messaging_events = req.body.entry[0].messaging
   for (let i = 0; i < messaging_events.length; i++) {
     let event = req.body.entry[0].messaging[i]
     let sender = event.sender.id
     if (event.message && event.message.text) {
-      sendTextMessage(sender, "Text Rec:, echo: " text.substring(0,200));
+      let text = event.message.text
+      sendTextMessage(sender, "<;>" + text.substring(0,200));
     }
   }
   res.sendStatus(200)
