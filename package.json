@@ -1,0 +1,28 @@
+{
+  "name": "liaison",
+  "version": "1.0.0",
+  "description": "",
+  "main": "document_conversion_service.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ianrtracey/liaison.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ianrtracey/liaison/issues"
+  },
+  "homepage": "https://github.com/ianrtracey/liaison#readme",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "dotenv": "^2.0.0",
+    "kue": "^0.11.4",
+    "watson-developer-cloud": "^2.6.2"
+  },
+  "devDependencies": {
+    "sleep": "^4.0.0"
+  }
+}
