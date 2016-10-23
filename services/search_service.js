@@ -1,6 +1,9 @@
 var watson =  require('watson-developer-cloud');
 var Promise = require('bluebird');
 require('dotenv').config()
+var utils = require("./utils/solr_doc.js");
+
+const cluster_id = 'sc8fc6b7fd_02d4_4206_bc3f_77e05b458a86';
 
 module.exports = {
 
@@ -59,5 +62,53 @@ module.exports = {
           callback(response);
         }
       })
-  }
+  },
+
+  getSolrClient: function() {
+    return this.service.createSolrClient({
+      cluster_id: cluster_id,
+      collection_name: 'default'
+    });
+  },
+
+  // used in conjunction with response from DocumentConversionService
+  addDocument: function(response) {
+    var solrClient = this.getSolrClient();
+    console.log('Indexing a document...');
+    var doc = utils.mapAnswerUnits2SolrDocs(response);
+    solrClient.add(doc, function(err) {
+      if (err) {
+        console.log('Error indexing document: ' + err);
+      } else {
+        console.log('Indexed a document.');
+        solrClient.commit(function(err) {
+          if (err) {
+            console.log('Error committing change: ' + err);
+          } else {
+            console.log('Successfully committed changes.');
+          }
+        });
+      }
+    });
+  },
+
+  search: function(query) {
+    console.log('Searching all documents.');
+    var solrClient = this.getSolrClient();
+    var query = solrClient.createQuery();
+    // This query searches for the term 'psychological' in the content_text field.
+    // For a wildcard query use:
+    // query.q({ '*' : '*' });
+    query.q({
+      'content_text': 'harvard'
+    });
+
+    solrClient.search(query, function(err, searchResponse) {
+      if (err) {
+        console.log('Error searching for documents: ' + err);
+      } else {
+        console.log('Found ' + searchResponse.response.numFound + ' document(s).');
+        console.log('First document: ' + JSON.stringify(searchResponse.response.docs[0], null, 2));
+      }
+    }); }
 }
