@@ -1,11 +1,12 @@
 'use strict'
-
 const express = require('express')
 const bodyParser = require('body-parser')
 const request = require('request')
 const app = express()
 
-const fb_token = process.env.FB_ACCESS_TOKEN;
+const Config = require('./config.js');
+var FB = require('./connectors/facebook')
+// var Bot = require('./bot')
 
 app.set('port', (process.env.PORT || 5000))
 
@@ -15,42 +16,26 @@ app.use(bodyParser.urlencoded({extended: false}))
 // Process application/json
 app.use(bodyParser.json())
 
-
-function sendTextMessage(sender, text) {
-  let messageData = {
-      text: text
-  }
-  request({
-    url: 'https://graph.facebook.com/v2.6/me/messages',
-    qs: { access_token: fb_token },
-    method: 'POST',
-    json: {
-      recipient: { id: sender },
-      message: messageData
-    }
-  }, function(err, resp, body) {
-      if (err) {
-        console.log('error sending message: ', error);
-      } else if (resp.body.error) {
-        console.log('Error: ', resp.body.error)
-      }
-  })
-}
-
 // Index route
 app.get('/', function (req, res) {
-    res.send('Hello world, I am a chat bot')
+    res.send('Hello world, I am a Liasion')
+})
+
+app.get('/webhooks', function (req, res) {
+  if (req.query['hub.verify_token'] === Config.FB_VERIFY_TOKEN) {
+    res.send(req.query['hub.challenge'])
+  }
+  res.send('Error, wrong token')
 })
 
 // for Facebook verification
 app.post('/webhook/', function (req, res) {
-  let messaging_events = req.body.entry[0].messaging
-  for (let i = 0; i < messaging_events.length; i++) {
-    let event = req.body.entry[0].messaging[i]
-    let sender = event.sender.id
-    if (event.message && event.message.text) {
-      let text = event.message.text
-      sendTextMessage(sender, "<;>" + text.substring(0,200));
+  var entry = FB.getMessageEntry(req.body)
+  if (entry && entry.message) {
+    if (entry.message.attachments) {
+      FB.newMessage(entry.sender.id, "I can't read attachments yet!")
+    } else {
+      FB.newMessage(entry.sender.id, 'cool, bro');
     }
   }
   res.sendStatus(200)
