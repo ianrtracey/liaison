@@ -44,5 +44,20 @@ module.exports = {
         callback(response.clusters[0]);
       }
     });
+  },
+
+  createCollection: function(cluster_id, callback) {
+      params = {
+        cluster_id: cluster_id,
+        config_name: 'default',
+        collection_name: 'default'
+      }
+      this.service.createCollection(params, function(err, response) {
+        if (err) {
+          throw err;
+        } else {
+          callback(response);
+        }
+      })
   }
 }
