@@ -7,7 +7,6 @@ const app = express()
 const Config = require('./config.js');
 var FB = require('./connectors/facebook')
 // var Bot = require('./bot')
-
 app.set('port', (process.env.PORT || 5000))
 
 // Process application/x-www-form-urlencoded
